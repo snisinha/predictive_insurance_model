@@ -25,7 +25,7 @@ This project builds a model for a unified dataset by combining vehicle, policy, 
 - Week 10: Documentation & Final Report
 
 ## Data to Collect and How
-Data is collected publically and is available in kaggle, it has 
+Data is collected publically and is available in kaggle (https://www.kaggle.com/datasets/ifteshanajnin/carinsuranceclaimprediction-classification/data), it will be broken into 
 - `datasets/car_features.csv` (vehicle attributes)
 - `datasets/insurance_claim.csv` (claim label per policy)
 - `datasets/policy_features.csv` (policyholder and policy attributes)
