@@ -12,6 +12,18 @@ This project builds a model for a unified dataset by combining vehicle, policy, 
 - Balance accuracy with recall/precision to reduce missed claims and false alarms.
 - Produce interpretable insights on which vehicle and policy attributes correlate with claims.
 
+## Project Timeline
+- Week 1: Project Setup and Data Understanding
+- Week 2: Data Cleaning & Merging
+- Week 3: Exploratory Data Analysis (EDA)
+- Week 4: Feature Engineering & Encoding
+- Week 5: Handle Class Imbalance
+- Week 6: Baseline Models
+- Week 7: Ensemble Model (Random Forest)
+- Week 8: Model Selection & Final Evaluation
+- Week 9: Interpretability & Business Insights
+- Week 10: Documentation & Final Report
+
 ## Data to Collect and How
 Data is collected publically and is available in kaggle, it has 
 - `datasets/car_features.csv` (vehicle attributes)
