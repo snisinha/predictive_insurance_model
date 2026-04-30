@@ -26,11 +26,10 @@ def encode_and_scale(df: pd.DataFrame) -> pd.DataFrame:
     # One-hot encode high-cardinality categoricals
     df = pd.get_dummies(df, columns=config.OHE_COLUMNS)
 
-    # Drop remaining object columns that weren't OHE'd
+    # Drop ALL remaining object columns (e.g. transmission_type, steering_type)
     obj_cols = df.select_dtypes(include=["object"]).columns.tolist()
-    extra_drops = [c for c in config.COLS_TO_DROP_OHE if c in obj_cols]
-    if extra_drops:
-        df.drop(extra_drops, axis=1, inplace=True)
+    if obj_cols:
+        df.drop(obj_cols, axis=1, inplace=True)
 
     # Scale numeric columns
     scaler = MinMaxScaler()

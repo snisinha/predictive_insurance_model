@@ -14,3 +14,6 @@ tensorflow
 
 # Statistics
 scipy
+
+#pytest
+pytest
