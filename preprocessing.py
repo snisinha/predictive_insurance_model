@@ -16,14 +16,11 @@ def encode_and_scale(df: pd.DataFrame) -> pd.DataFrame:
     """
     df = df.copy()
 
-    # Drop identifier column if present
     if "policy_id" in df.columns:
         df.drop("policy_id", axis=1, inplace=True)
 
-    # Binary-encode Yes/No
     df.replace({"Yes": 1, "No": 0}, inplace=True)
 
-    # One-hot encode high-cardinality categoricals
     df = pd.get_dummies(df, columns=config.OHE_COLUMNS)
 
     # Drop ALL remaining object columns (e.g. transmission_type, steering_type)
@@ -31,7 +28,6 @@ def encode_and_scale(df: pd.DataFrame) -> pd.DataFrame:
     if obj_cols:
         df.drop(obj_cols, axis=1, inplace=True)
 
-    # Scale numeric columns
     scaler = MinMaxScaler()
     cols_present = [c for c in config.COLS_TO_SCALE if c in df.columns]
     df[cols_present] = scaler.fit_transform(df[cols_present])
@@ -40,11 +36,13 @@ def encode_and_scale(df: pd.DataFrame) -> pd.DataFrame:
 
 
 def _balance(df: pd.DataFrame) -> pd.DataFrame:
-    """Undersample majority class to match minority class size."""
+    """Undersample the majority class to match the minority class size."""
     pos = df[df["is_claim"] == 1]
     neg = df[df["is_claim"] == 0]
-    neg_sample = neg.sample(n=len(pos), random_state=config.RANDOM_STATE)
-    balanced = pd.concat([pos, neg_sample], axis=0)
+    # Always sample the majority DOWN to minority size — no replacement needed
+    majority, minority = (neg, pos) if len(neg) >= len(pos) else (pos, neg)
+    majority_sample = majority.sample(n=len(minority), random_state=config.RANDOM_STATE)
+    balanced = pd.concat([minority, majority_sample], axis=0)
     return balanced.sample(frac=1, random_state=config.RANDOM_STATE).reset_index(drop=True)
 
 
@@ -54,23 +52,16 @@ def split_data(df: pd.DataFrame) -> Tuple[
 ]:
     """
     Split into balanced train / validation / test sets.
-
-    Returns
-    -------
-    X_train, X_valid, X_test, y_train, y_valid, y_test
+    Returns: X_train, X_valid, X_test, y_train, y_valid, y_test
     """
-    # Shuffle entire dataset
     data = df.sample(n=len(df), random_state=config.RANDOM_STATE).reset_index(drop=True)
 
-    # Carve out 30 % for valid + test
     valid_test = data.sample(frac=config.VALID_TEST_FRAC, random_state=config.RANDOM_STATE)
     train_all  = data.drop(valid_test.index)
 
-    # Split valid_test 50 / 50
     test  = valid_test.sample(frac=config.TEST_FRAC_OF_VALID_TEST, random_state=config.RANDOM_STATE)
     valid = valid_test.drop(test.index)
 
-    # Balance each split
     train = _balance(train_all)
     valid = _balance(valid)
     test  = _balance(test)
