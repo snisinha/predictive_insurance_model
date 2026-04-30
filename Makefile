@@ -1,4 +1,4 @@
-.PHONY: install install-deps run eda models clean help
+.PHONY: install install-deps run eda models test clean help
 
 VENV    = venv
 PYTHON  = $(VENV)/bin/python
@@ -27,6 +27,11 @@ eda: install
 models: install
 	$(PYTHON) main.py --skip-eda
 
+# ── Test ──────────────────────────────────────────────────────────────────────
+
+test: install
+	$(PYTHON) -m pytest tests/ -v
+
 # ── Clean ─────────────────────────────────────────────────────────────────────
 
 clean:
@@ -46,5 +51,6 @@ help:
 	@echo "  make run            Run the full pipeline (EDA + all models)"
 	@echo "  make eda            Run EDA only"
 	@echo "  make models         Run models only (skip EDA)"
+	@echo "  make test           Run tests"
 	@echo "  make clean          Remove venv and cache files"
 	@echo "  make clean-outputs  Remove generated outputs/"
