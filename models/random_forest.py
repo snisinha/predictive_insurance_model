@@ -1,4 +1,4 @@
-# models/random_forest.py
+"""models/random_forest.py - Random Forest model"""
 
 import numpy as np
 from sklearn.ensemble import RandomForestClassifier

@@ -1,4 +1,4 @@
-# eda.py — exploratory data analysis: statistics and visualisations
+"""eda.py - exploratory data analysis: statistics and visualisations"""
 
 import os
 import pandas as pd

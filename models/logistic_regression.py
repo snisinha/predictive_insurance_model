@@ -1,4 +1,4 @@
-# models/logistic_regression.py
+"""models/logistic_regression.py - Logistic Regression model"""
 
 import numpy as np
 from sklearn.linear_model import LogisticRegression

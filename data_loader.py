@@ -1,4 +1,4 @@
-# data_loader.py — load and perform basic cleaning on the raw dataset
+"""data_loader.py — load and perform basic cleaning on the raw dataset"""
 
 import pandas as pd
 

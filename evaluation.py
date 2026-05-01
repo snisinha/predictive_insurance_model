@@ -1,4 +1,4 @@
-# evaluation.py — metrics, confusion matrix, ROC curve, and model comparison
+"""evaluation.py - metrics, confusion matrix, ROC curve, and model comparison"""
 
 import os
 import numpy as np

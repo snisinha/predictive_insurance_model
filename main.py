@@ -1,10 +1,9 @@
-# main.py — entry point; orchestrates the full pipeline
-#
-# Usage:
-#   python main.py               # full pipeline (EDA + all models)
-#   python main.py --eda-only    # stop after EDA
-#   python main.py --skip-eda    # skip EDA, run models only
-#   python main.py --predict     # also save NN test predictions to CSV
+"""main.py - entry point; runs the full pipeline
+Usage:
+python main.py               runfull pipeline (EDA + all models)
+python main.py --eda-only    stop after EDA
+python main.py --skip-eda    skip EDA, run models only
+python main.py --predict     save NN test predictions to CSV"""
 
 import argparse
 import os

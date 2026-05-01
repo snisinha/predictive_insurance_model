@@ -1,4 +1,4 @@
-# models/decision_tree.py
+"""models/decision_tree.py - Decision Tree model"""
 
 import numpy as np
 from sklearn.tree import DecisionTreeClassifier

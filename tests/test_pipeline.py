@@ -1,4 +1,4 @@
-# tests/test_pipeline.py
+"""tests/test_pipeline.py - run tests on the full pipeline"""
 
 import pandas as pd
 import numpy as np

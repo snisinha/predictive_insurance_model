@@ -1,4 +1,4 @@
-# models/neural_network.py
+"""models/neural_network.py - Neural Network model"""
 
 import os
 import numpy as np

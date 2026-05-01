@@ -1,4 +1,4 @@
-# config.py — central place for all paths, seeds, and hyperparameters
+"""config.py - configuration file"""
 
 # ── Data ──────────────────────────────────────────────────────────────────────
 DATA_PATH = "datasets/dataset_main.csv"
