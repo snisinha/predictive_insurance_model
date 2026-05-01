@@ -119,7 +119,7 @@ If you start from the original Kaggle bundle (e.g. separate vehicle / policy / c
 
 ## 6. Model training and evaluation
 
-### Procedure (what the code does)
+### Procedure 
 
 1. **Load & clean** → `data_loader.load_data`.
 2. **EDA (optional skip)** → `eda.run_eda` writes plots under `outputs/eda/`.
@@ -137,19 +137,20 @@ If you start from the original Kaggle bundle (e.g. separate vehicle / policy / c
 ### Model choice
 
 - **Logistic regression:** Interpretable linear probabilities; strong baseline.
-- **Decision tree / random forest:** Natural fit for **mixed numeric + binary + sparse OHE** tabular data; RF reduces variance vs a single tree.
+- **Decision tree / random forest:** Natural fit for **mixed numeric + binary + sparse OHE** tabular data and RF reduces variance vs a single tree. It is helpful since the features are not linearly correlated.
+
+All the models are hyperparameter tuned, the best parameters are used here.
 
 ### Evaluation strategy
 
-- **Metrics:** Accuracy, per-class rates from confusion matrix, ROC-AUC, side-by-side bar comparison.
-- **Plots:** Per-model ROC + **joint ROC** for ranking discriminative ability.
+- **Metrics:** Accuracy, per-class rates from confusion matrix, ROC-AUC.
 
 ### Limitations and failure modes
 
 
-- **Dropped nulls:** May bias toward complete policies only.
-- **Logistic regression** may show **convergence warnings** with default solvers/iterations on wide sparse OHE features.
-- **Dropped object columns:** If important signal lived only there, models cannot use it.
+- **Logistic regression** too weak as it is a linear model for this dataset.
+- **Dropped residula object columns/missing values:** If important signal lived only there, models cannot use it.
+-- **SMOTE assumptions:**  Synthetic minority examples are built from feature space neighborhoods. They are not real policies. They can sharpen boundaries in ways that do not match future real claim rates, even though it helps the class imbalance.
 
 ---
 
@@ -175,8 +176,8 @@ After `make run` (or `python main.py`):
 
 ### Insights from EDA
 
-- Claim rate is low overall (~6.4% in recent runs); imbalance motivates resampling.
-- The correlation map shows that the features are not lineraly correlated with the target variable, which motivates the use of more complex models like Random Forest.
+- **Class imbalance:** On the cleaned dataset used for the latest EDA run, **`is_claim`** is **0** for **54,701** policies (~**93.6%**) and **1** for **3,741** (~**6.4%**). The figure `outputs/eda/target_distribution_is_claim.png` matches these counts (see also the printed “Target class distribution” block in the EDA log). Heavy skew motivates SMOTE (or similar) in the modeling pipeline.
+- The correlation heatmap shows that individual numeric features are **not strongly linearly** correlated with `is_claim`, which supports using **nonlinear** models (e.g. tree-based) in addition to logistic regression.
 
 
 
