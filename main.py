@@ -83,7 +83,7 @@ def main() -> None:
     print(f"  Fit time: {time.time() - t0:.1f}s")
 
     y_pred_nn, y_score_nn = neural_network.predict(nn_model, X_nn_test)
-    _, train_acc_nn = nn_model.evaluate(X_nn_train, y_nn_train, verbose=0)
+    train_acc_nn = nn_model.evaluate(X_nn_train, y_nn_train, verbose=0)[1]
 
     metrics_nn = evaluation.evaluate_model(
         "Neural Network", y_nn_test, y_pred_nn, y_score_nn,

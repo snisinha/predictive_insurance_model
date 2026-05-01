@@ -1,4 +1,4 @@
-"""preprocessing.py - encoding, scaling, balancing, and train/val/test split"""
+# preprocessing.py — encoding, scaling, balancing, and train/val/test split
 
 import pandas as pd
 import numpy as np
@@ -87,11 +87,31 @@ def split_data(df: pd.DataFrame) -> Tuple[
 def split_data_nn(df: pd.DataFrame) -> Tuple[
     pd.DataFrame, pd.DataFrame, pd.Series, pd.Series,
 ]:
-    """Simple stratified 80/20 split used by the neural network."""
-    X = df.drop("is_claim", axis=1)
-    y = df["is_claim"]
-    return train_test_split(
-        X, y,
+    """
+    80/20 split for the neural network with a balanced training set.
+
+    - Train : majority class undersampled to 50/50 so the NN learns both classes
+    - Test  : kept at natural class distribution for honest sensitivity/specificity
+    """
+    # Hold out 20 % as the test set (natural distribution)
+    train_df, test_df = train_test_split(
+        df,
         test_size=config.NN_TEST_SIZE,
         random_state=config.RANDOM_STATE,
+        stratify=df["is_claim"],
     )
+
+    # Balance the training split
+    train_df = _balance(train_df)
+
+    pos = train_df["is_claim"].sum()
+    neg = (train_df["is_claim"] == 0).sum()
+    print(f"NN train distribution: {{0: {neg}, 1: {pos}}}")
+    print(f"NN test  distribution: {dict(test_df['is_claim'].value_counts().sort_index())}")
+
+    X_train = train_df.drop("is_claim", axis=1)
+    y_train = train_df["is_claim"].values
+    X_test  = test_df.drop("is_claim",  axis=1)
+    y_test  = test_df["is_claim"].values
+
+    return X_train, X_test, y_train, y_test

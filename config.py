@@ -40,4 +40,4 @@ NN_ACTIVATION = "relu"
 NN_OUTPUT_ACTIVATION = "sigmoid"
 NN_LOSS = "binary_crossentropy"
 NN_OPTIMIZER = "adam"
-NN_THRESHOLD = 0.5
+NN_THRESHOLD = 0.4
