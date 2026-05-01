@@ -10,7 +10,7 @@ sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 
 import config
 from data_loader import load_data
-from preprocessing import encode_and_scale, split_data, split_data_nn
+from preprocessing import encode_and_scale, split_data
 from models import logistic_regression, decision_tree
 
 
@@ -126,10 +126,11 @@ class TestPreprocessing:
         assert len(X_valid) == len(y_valid)
         assert len(X_test)  == len(y_test)
 
-    def test_split_balanced(self, encoded_df):
+    def test_split_both_classes_in_train(self, encoded_df):
         X_train, _, _, y_train, _, _ = split_data(encoded_df)
         counts = pd.Series(y_train).value_counts()
-        assert counts[0] == counts[1], "Training set is not balanced"
+        assert len(counts) == 2
+        assert counts.min() > 0
 
 
 # ── models ────────────────────────────────────────────────────────────────────

@@ -1,9 +1,8 @@
 """main.py - entry point; runs the full pipeline
 Usage:
-python main.py               runfull pipeline (EDA + all models)
+python main.py               run full pipeline (EDA + all models)
 python main.py --eda-only    stop after EDA
-python main.py --skip-eda    skip EDA, run models only
-python main.py --predict     save NN test predictions to CSV"""
+python main.py --skip-eda    skip EDA, run models only"""
 
 import argparse
 import os
@@ -14,7 +13,11 @@ import data_loader
 import eda
 import preprocessing
 import evaluation
-from models import logistic_regression, decision_tree, random_forest, neural_network
+from models import (
+    logistic_regression,
+    decision_tree,
+    random_forest,
+)
 
 
 def parse_args() -> argparse.Namespace:
@@ -22,7 +25,6 @@ def parse_args() -> argparse.Namespace:
     group = parser.add_mutually_exclusive_group()
     group.add_argument("--eda-only",  action="store_true", help="Run EDA then exit")
     group.add_argument("--skip-eda",  action="store_true", help="Skip EDA, run models only")
-    parser.add_argument("--predict",  action="store_true", help="Save NN test predictions to CSV")
     return parser.parse_args()
 
 
@@ -74,37 +76,9 @@ def main() -> None:
         metrics["train_acc"] = train_acc
         results[name] = metrics
 
-    # ── 5. Train & evaluate neural network ───────────────────────────────────
-    print("\n Training: Neural Network")
-    X_nn_train, X_nn_test, y_nn_train, y_nn_test = preprocessing.split_data_nn(df_enc)
-
-    t0 = time.time()
-    nn_model = neural_network.train(X_nn_train, y_nn_train)
-    print(f"  Fit time: {time.time() - t0:.1f}s")
-
-    y_pred_nn, y_score_nn = neural_network.predict(nn_model, X_nn_test)
-    train_acc_nn = nn_model.evaluate(X_nn_train, y_nn_train, verbose=0)[1]
-
-    metrics_nn = evaluation.evaluate_model(
-        "Neural Network", y_nn_test, y_pred_nn, y_score_nn,
-        output_dir=model_dir,
-    )
-    metrics_nn["train_acc"] = train_acc_nn * 100
-    results["Neural Network"] = metrics_nn
-
-    # ── 6. Compare all models ─────────────────────────────────────────────────
-    print("\n 6. Model Comparison")
+    # ── 5. Compare all models ─────────────────────────────────────────────────
+    print("\n 5. Model Comparison")
     evaluation.compare_models(results, output_dir=model_dir)
-
-    # ── 7. Save NN predictions to CSV (optional) ──────────────────────────────
-    if args.predict:
-        print("\n 7. Saving final predictions")
-        neural_network.predict_to_csv(
-            model=nn_model,
-            X_test=X_nn_test,
-            y_test=y_nn_test,
-            output_dir=model_dir,
-        )
 
     print("\n✓ Pipeline complete. Outputs written to:", config.OUTPUT_DIR)
 

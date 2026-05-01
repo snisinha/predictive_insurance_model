@@ -31,12 +31,3 @@ RF_CRITERION = "gini"
 RF_MAX_FEATURES = "log2"
 RF_MIN_SAMPLES_LEAF = 1
 RF_MIN_SAMPLES_SPLIT = 5
-
-# ── Neural Network ────────────────────────────────────────────────────────────
-NN_EPOCHS = 20
-NN_TEST_SIZE = 0.20
-NN_ACTIVATION = "relu"
-NN_OUTPUT_ACTIVATION = "sigmoid"
-NN_LOSS = "binary_crossentropy"
-NN_OPTIMIZER = "adam"
-NN_THRESHOLD = 0.55

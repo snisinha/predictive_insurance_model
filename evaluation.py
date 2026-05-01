@@ -12,7 +12,7 @@ from sklearn.metrics import (
     roc_curve,
     auc,
 )
-from typing import Dict, Any
+from typing import Any, Dict
 
 
 def _save(fig_name: str, output_dir: str) -> None:
@@ -43,7 +43,8 @@ def evaluate_model(
 
     Returns
     -------
-    dict with train_acc, test_acc, sensitivity, specificity, roc_auc
+    dict with test_acc, sensitivity, specificity, roc_auc, fpr, tpr
+    (fpr/tpr are used for the joint ROC figure in compare_models.)
     """
     test_acc  = accuracy_score(y_true, y_pred) * 100
     cm        = confusion_matrix(y_true, y_pred)
@@ -87,6 +88,8 @@ def evaluate_model(
         "sensitivity": sensitivity,
         "specificity": specificity,
         "roc_auc":     roc_auc,
+        "fpr":         fpr,
+        "tpr":         tpr,
     }
 
 
@@ -113,7 +116,47 @@ def compare_models(results: Dict[str, Dict[str, float]], output_dir: str) -> Non
     plt.legend()
     _save("model_comparison.png", output_dir)
 
-    summary = pd.DataFrame(results).T
+    # Joint ROC (all models on one axes)
+    colors = (
+        "#1f77b4",
+        "#ff7f0e",
+        "#2ca02c",
+        "#d62728",
+        "#9467bd",
+        "#8c564b",
+        "#e377c2",
+        "#7f7f7f",
+    )
+    plt.figure(figsize=(8, 7))
+    for i, name in enumerate(labels):
+        row = results[name]
+        fpr = row.get("fpr")
+        tpr = row.get("tpr")
+        if fpr is None or tpr is None:
+            continue
+        auc_val = row.get("roc_auc", auc(fpr, tpr))
+        plt.plot(
+            fpr,
+            tpr,
+            lw=2,
+            color=colors[i % len(colors)],
+            label=f"{name} (AUC = {auc_val:.3f})",
+        )
+    plt.plot([0, 1], [0, 1], "k--", lw=1, alpha=0.5, label="Chance")
+    plt.xlim([0.0, 1.0])
+    plt.ylim([0.0, 1.05])
+    plt.xlabel("False Positive Rate")
+    plt.ylabel("True Positive Rate")
+    plt.title("ROC Curves — All Models")
+    plt.legend(loc="lower right", fontsize=9)
+    plt.grid(True, alpha=0.3)
+    _save("roc_all_models.png", output_dir)
+
+    summary_rows = {
+        m: {k: v for k, v in results[m].items() if k not in ("fpr", "tpr")}
+        for m in labels
+    }
+    summary = pd.DataFrame(summary_rows).T
     print("\n── Model Summary ───────────────────────────────────────────────")
     print(summary.to_string())
     summary.to_csv(os.path.join(output_dir, "model_summary.csv"))

@@ -1,64 +1,46 @@
-.PHONY: install install-deps run eda models predict models-predict test clean clean-outputs help
 
-VENV    = venv
-PYTHON  = $(VENV)/bin/python
-PIP     = $(VENV)/bin/pip
+PYTHON      ?= python3
+VENV        ?= .venv
+PIP         := $(VENV)/bin/pip
+PY          := $(VENV)/bin/python
 
-# ── Setup ─────────────────────────────────────────────────────────────────────
+.PHONY: default install build test run run-fast run-eda-only clean help
 
-$(VENV)/bin/activate: requirements.txt
-	python3 -m venv $(VENV)
+default: help
+
+help:
+	@echo "Predictive Insurance Model"
+	@echo ""
+	@echo "  make install     Create $(VENV) and install dependencies"
+	@echo "  make build       Same as install (reproducible environment)"
+	@echo "  make test        Run pytest"
+	@echo "  make run         Full pipeline (EDA + train/evaluate models)"
+	@echo "  make run-fast    Models only (--skip-eda)"
+	@echo "  make run-eda-only  EDA only, then exit"
+	@echo "  make clean       Remove virtualenv"
+	@echo ""
+	@echo "Requires: $(PYTHON), datasets/dataset_main.csv for run targets"
+
+$(VENV)/bin/activate:
+	$(PYTHON) -m venv $(VENV)
 	$(PIP) install --upgrade pip
-	$(PIP) install -r requirements.txt
 
 install: $(VENV)/bin/activate
-
-install-deps: install
 	$(PIP) install -r requirements.txt
 
-# ── Run ───────────────────────────────────────────────────────────────────────
-
-run: install
-	$(PYTHON) main.py
-
-eda: install
-	$(PYTHON) main.py --eda-only
-
-models: install
-	$(PYTHON) main.py --skip-eda
-
-predict: install
-	$(PYTHON) main.py --skip-eda --predict
-
-models-predict: install
-	$(PYTHON) main.py --predict
-
-# ── Test ──────────────────────────────────────────────────────────────────────
+build: install
 
 test: install
-	$(PYTHON) -m pytest tests/ -v
+	$(PY) -m pytest tests/ -q
 
-# ── Clean ─────────────────────────────────────────────────────────────────────
+run: install
+	$(PY) main.py
+
+run-fast: install
+	$(PY) main.py --skip-eda
+
+run-eda-only: install
+	$(PY) main.py --eda-only
 
 clean:
 	rm -rf $(VENV)
-	find . -type f -name "*.pyc" -delete
-	find . -type d -name "__pycache__" -delete
-
-clean-outputs:
-	rm -rf outputs/
-
-# ── Help ──────────────────────────────────────────────────────────────────────
-
-help:
-	@echo "Available targets:"
-	@echo "  make install         Create venv"
-	@echo "  make install-deps    Create venv and install requirements.txt"
-	@echo "  make run             Full pipeline (EDA + all models)"
-	@echo "  make eda             EDA only"
-	@echo "  make models          Train all models, skip EDA"
-	@echo "  make predict         Train all models, skip EDA, save NN predictions to CSV"
-	@echo "  make models-predict  Full pipeline (EDA + models) and save NN predictions to CSV"
-	@echo "  make test            Run tests"
-	@echo "  make clean           Remove venv and cache files"
-	@echo "  make clean-outputs   Remove generated outputs/"

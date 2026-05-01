@@ -1,19 +1,8 @@
-# Core data science
 pandas
 numpy
-
-# Visualization
 matplotlib
 seaborn
-
-# Machine learning
 scikit-learn
-
-# Deep learning
-tensorflow
-
-# Statistics
+imbalanced-learn
 scipy
-
-#pytest
 pytest

@@ -24,6 +24,30 @@ def chi_squared_ncap(df: pd.DataFrame) -> None:
     print(f"Degrees of freedom:    {dof}")
 
 
+def plot_target_distribution(df: pd.DataFrame, output_dir: str) -> None:
+    """Bar chart of is_claim counts (class imbalance)."""
+    plt.figure(figsize=(6, 4))
+    order = sorted(df["is_claim"].dropna().unique())
+    ax = sns.countplot(data=df, x="is_claim", order=order, color="steelblue", alpha=0.88)
+    plt.xlabel("is_claim (0 = no claim, 1 = claim)")
+    plt.ylabel("Count")
+    plt.title("Distribution of target class (is_claim)")
+    total = len(df)
+    for p in ax.patches:
+        h = p.get_height()
+        if h <= 0:
+            continue
+        ax.annotate(
+            f"{int(h)}\n({100 * h / total:.2f}%)",
+            (p.get_x() + p.get_width() / 2, h),
+            ha="center",
+            va="bottom",
+            fontsize=10,
+        )
+    plt.tight_layout()
+    _save("target_distribution_is_claim.png", output_dir)
+
+
 def plot_categorical_vs_claim(df: pd.DataFrame, output_dir: str) -> None:
     """Bar plots for each categorical feature vs is_claim."""
     categorical_cols = [
@@ -93,7 +117,14 @@ def run_eda(df: pd.DataFrame, output_dir: str) -> None:
     print("\n── Pivot: make × ncap_rating ───────────────────────────────────")
     print(pivot_make_ncap(df))
 
+    print("\n── Target class distribution (is_claim) ────────────────────────")
+    vc = df["is_claim"].value_counts().sort_index()
+    print(vc.to_string())
+    print("\nPercent:")
+    print((100 * vc / len(df)).round(3).to_string())
+
     print("\n── Generating plots … ──────────────────────────────────────────")
+    plot_target_distribution(df, output_dir)
     plot_categorical_vs_claim(df, output_dir)
     plot_correlation_heatmap(df, output_dir)
     plot_pairplots(df, output_dir)
