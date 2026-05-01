@@ -122,7 +122,7 @@ If you start from the original Kaggle bundle (e.g. separate vehicle / policy / c
 ### Procedure 
 
 1. **Load & clean** → `data_loader.load_data`.
-2. **EDA (optional skip)** → `eda.run_eda` writes plots under `outputs/eda/`.
+2. **EDA** → `eda.run_eda` writes plots under `outputs/eda/`.
 3. **Encode & scale** → `preprocessing.encode_and_scale`.
 4. **Split & balance:**
    - `train_test_split(..., stratify=y)` on raw encoded data (80/20).
@@ -176,7 +176,7 @@ After `make run` (or `python main.py`):
 
 ### Insights from EDA
 
-- **Class imbalance:** On the cleaned dataset used for the latest EDA run, **`is_claim`** is **0** for **54,701** policies (~**93.6%**) and **1** for **3,741** (~**6.4%**). The figure `outputs/eda/target_distribution_is_claim.png` matches these counts (see also the printed “Target class distribution” block in the EDA log). Heavy skew motivates SMOTE (or similar) in the modeling pipeline.
+- **Class imbalance:** On the cleaned dataset used for the latest EDA run, **`is_claim`** is 0 for 54,701 policies (**93.6%**) and 1 for 3,741 (**6.4%**). The figure `outputs/eda/target_distribution_is_claim.png` matches these counts. Heavy skew motivates SMOTE (or similar) in the modeling pipeline.
 - The correlation heatmap shows that individual numeric features are **not strongly linearly** correlated with `is_claim`, which supports using **nonlinear** models (e.g. tree-based) in addition to logistic regression.
 
 
