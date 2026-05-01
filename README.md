@@ -37,7 +37,7 @@ make test
 make run       
 ```
 
-Outputs are written under **`outputs/`** 
+Generated artifacts are saved under **`outputs/`** (this folder is **tracked in git** so the main figures and metrics are visible on GitHub without re-running the pipeline). Re-run `make run` or `make run-fast` to refresh them after code or data changes.
 
 **CLI without Make**:
 
@@ -64,6 +64,7 @@ python main.py
 | `models/` | `logistic_regression.py`, `decision_tree.py`, `random_forest.py` |
 | `tests/test_pipeline.py` | Unit tests for loader, preprocessing, and two sklearn models |
 | `datasets/` | Expected location of `dataset_main.csv` |
+| `outputs/` | EDA plots, confusion matrices, ROC curves, `model_summary.csv` (versioned for the report) |
 | `Makefile` | **Install, test, run** |
 | `.github/workflows/ci.yml` | CI: install deps + pytest on push/PR |
 
@@ -148,15 +149,31 @@ All the models are hyperparameter tuned, the best parameters are used here.
 ### Limitations and failure modes
 
 
-- **Logistic regression** too weak as it is a linear model for this dataset.
-- **Dropped residula object columns/missing values:** If important signal lived only there, models cannot use it.
--- **SMOTE assumptions:**  Synthetic minority examples are built from feature space neighborhoods. They are not real policies. They can sharpen boundaries in ways that do not match future real claim rates, even though it helps the class imbalance.
+- **Logistic regression** is relatively weak here as a strictly linear model for this dataset.
+- **Dropped residual object columns / missing values:** If important signal lived only in removed columns or dropped rows, models cannot use it.
+- **SMOTE assumptions:** Synthetic minority examples are built from feature space neighborhoods. They are not real policies. They can sharpen boundaries in ways that do not match future real claim rates, even though they help class imbalance.
 
 ---
 
 ## 7. Data visualizations and results
 
-### Where plots are saved
+### Key figures (in repository)
+
+These images are stored under `outputs/` and render directly on GitHub when you view this README.
+
+**Target class imbalance (`is_claim`)** — counts and share of all policies after cleaning:
+
+![Distribution of target class is_claim](outputs/eda/target_distribution_is_claim.png)
+
+**Numeric feature correlations** (Pearson; includes `is_claim`):
+
+![Correlation heatmap](outputs/eda/correlation_heatmap.png)
+
+**Model discrimination** — ROC curves for all trained classifiers on the same evaluation slice (legend shows AUC):
+
+![ROC curves for all models](outputs/models/roc_all_models.png)
+
+### Where other outputs are saved
 
 After `make run` (or `python main.py`):
 
@@ -171,8 +188,6 @@ After `make run` (or `python main.py`):
 | `outputs/models/roc_all_models.png` | **All models on one ROC chart** (legend with AUC) |
 | `outputs/models/model_comparison.png` | Train vs test accuracy by model |
 | `outputs/models/model_summary.csv` | Scalar metrics table |
-
-
 
 ### Insights from EDA
 
