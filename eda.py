@@ -26,25 +26,31 @@ def chi_squared_ncap(df: pd.DataFrame) -> None:
 
 def plot_target_distribution(df: pd.DataFrame, output_dir: str) -> None:
     """Bar chart of is_claim counts (class imbalance)."""
-    plt.figure(figsize=(6, 4))
+    fig, ax = plt.subplots(figsize=(7, 5))
     order = sorted(df["is_claim"].dropna().unique())
-    ax = sns.countplot(data=df, x="is_claim", order=order, color="steelblue", alpha=0.88)
-    plt.xlabel("is_claim (0 = no claim, 1 = claim)")
-    plt.ylabel("Count")
-    plt.title("Distribution of target class (is_claim)")
+    sns.countplot(data=df, x="is_claim", order=order, color="steelblue", alpha=0.88, ax=ax)
+    ax.set_xlabel("is_claim (0 = no claim, 1 = claim)")
+    ax.set_ylabel("Count")
+    ax.set_title("Distribution of target class (is_claim)", pad=20)
     total = len(df)
+    ymax = 0.0
+    for p in ax.patches:
+        ymax = max(ymax, p.get_height())
     for p in ax.patches:
         h = p.get_height()
         if h <= 0:
             continue
         ax.annotate(
-            f"{int(h)}\n({100 * h / total:.2f}%)",
+            f"{int(h):,}\n({100 * h / total:.2f}%)",
             (p.get_x() + p.get_width() / 2, h),
             ha="center",
             va="bottom",
             fontsize=10,
+            linespacing=1.15,
         )
-    plt.tight_layout()
+    # Headroom so labels above the tallest bar do not overlap the title
+    ax.set_ylim(0, ymax * 1.28 if ymax else 1.0)
+    fig.tight_layout(rect=(0, 0, 1, 0.94))
     _save("target_distribution_is_claim.png", output_dir)
 
 
