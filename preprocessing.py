@@ -84,34 +84,52 @@ def split_data(df: pd.DataFrame) -> Tuple[
     return X_train, X_valid, X_test, y_train, y_valid, y_test
 
 
+from typing import Tuple
+import pandas as pd
+from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import StandardScaler
+
 def split_data_nn(df: pd.DataFrame) -> Tuple[
-    pd.DataFrame, pd.DataFrame, pd.Series, pd.Series,
+    pd.DataFrame, pd.DataFrame, pd.Series, pd.Series
 ]:
     """
-    80/20 split for the neural network with a balanced training set.
+    80/20 split for NN
 
-    - Train : majority class undersampled to 50/50 so the NN learns both classes
-    - Test  : kept at natural class distribution for honest sensitivity/specificity
+    - Train: balanced (50/50 via undersampling)
+    - Test: natural distribution
+    - Features scaled
     """
-    # Hold out 20 % as the test set (natural distribution)
-    train_df, test_df = train_test_split(
-        df,
+
+    X = df.drop("is_claim", axis=1)
+    y = df["is_claim"]
+
+    # Step 1: Train-test split (natural distribution)
+    X_train, X_test, y_train, y_test = train_test_split(
+        X,
+        y,
         test_size=config.NN_TEST_SIZE,
         random_state=config.RANDOM_STATE,
-        stratify=df["is_claim"],
+        stratify=y
     )
 
-    # Balance the training split
-    train_df = _balance(train_df)
+    # Step 2: Balance training set
+    train_df = X_train.copy()
+    train_df["is_claim"] = y_train
 
-    pos = train_df["is_claim"].sum()
-    neg = (train_df["is_claim"] == 0).sum()
-    print(f"NN train distribution: {{0: {neg}, 1: {pos}}}")
-    print(f"NN test  distribution: {dict(test_df['is_claim'].value_counts().sort_index())}")
+    class_0 = train_df[train_df["is_claim"] == 0]
+    class_1 = train_df[train_df["is_claim"] == 1]
 
-    X_train = train_df.drop("is_claim", axis=1)
-    y_train = train_df["is_claim"].values
-    X_test  = test_df.drop("is_claim",  axis=1)
-    y_test  = test_df["is_claim"].values
+    if len(class_0) > len(class_1):
+        class_0 = class_0.sample(len(class_1), random_state=config.RANDOM_STATE)
+    else:
+        class_1 = class_1.sample(len(class_0), random_state=config.RANDOM_STATE)
 
-    return X_train, X_test, y_train, y_test
+    train_balanced = pd.concat([class_0, class_1]).sample(
+        frac=1,
+        random_state=config.RANDOM_STATE
+    )
+
+    X_train_bal = train_balanced.drop("is_claim", axis=1)
+    y_train_bal = train_balanced["is_claim"]
+
+    return X_train_bal, X_test, y_train_bal.values, y_test.values

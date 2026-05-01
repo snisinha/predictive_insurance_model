@@ -35,9 +35,8 @@ RF_MIN_SAMPLES_SPLIT = 5
 # ── Neural Network ────────────────────────────────────────────────────────────
 NN_EPOCHS = 20
 NN_TEST_SIZE = 0.20
-NN_HIDDEN_LAYERS = [114, 65, 45, 15]  # units per hidden layer
 NN_ACTIVATION = "relu"
 NN_OUTPUT_ACTIVATION = "sigmoid"
 NN_LOSS = "binary_crossentropy"
 NN_OPTIMIZER = "adam"
-NN_THRESHOLD = 0.4
+NN_THRESHOLD = 0.55
