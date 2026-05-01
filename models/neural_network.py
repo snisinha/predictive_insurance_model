@@ -1,6 +1,8 @@
 # models/neural_network.py
 
+import os
 import numpy as np
+import pandas as pd
 import tensorflow as tf
 from tensorflow import keras
 import config
@@ -36,3 +38,35 @@ def predict(model: keras.Sequential, X) -> tuple[np.ndarray, np.ndarray]:
     y_score = model.predict(X).flatten()
     y_pred  = (y_score > config.NN_THRESHOLD).astype(int)
     return y_pred, y_score
+
+
+def predict_to_csv(
+    model: keras.Sequential,
+    X_test: pd.DataFrame,
+    y_test: np.ndarray,
+    output_dir: str,
+    filename: str = "nn_test_predictions.csv",
+) -> str:
+    """
+    Run the model on X_test, then save a CSV with columns:
+        predicted_label  — 0 or 1
+        probability      — raw sigmoid score
+        actual_label     — ground truth (optional; pass None to omit)
+
+    Returns the path to the saved file.
+    """
+    y_pred, y_score = predict(model, X_test)
+
+    results = pd.DataFrame({
+        "predicted_label": y_pred,
+        "probability":     y_score.round(4),
+    })
+
+    if y_test is not None:
+        results.insert(0, "actual_label", y_test)
+
+    os.makedirs(output_dir, exist_ok=True)
+    out_path = os.path.join(output_dir, filename)
+    results.to_csv(out_path, index=False)
+    print(f"\nPredictions saved to: {out_path}  ({len(results)} rows)")
+    return out_path
