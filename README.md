@@ -2,6 +2,8 @@
 
 Binary classification of **car insurance claims**: predict `is_claim` (0/1) from vehicle and policy attributes. This repository contains the full pipeline—loading, cleaning, exploratory analysis, feature encoding, resampling, model training, and evaluation.
 
+**Video Presentation:** [YouTube](https://youtu.be/GmfD6dbCbRY)
+
 ---
 
 ## 1. How to build and run 
